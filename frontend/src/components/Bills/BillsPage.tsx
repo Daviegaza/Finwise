@@ -1,3 +1,4 @@
+import { getCurrencySymbol } from '../../utils/currency';
 import React, { useState } from 'react';
 import { Plus, Check, RotateCcw, Trash2, Receipt, AlertTriangle } from 'lucide-react';
 import { useBills } from '../../hooks/useBills';
@@ -5,9 +6,10 @@ import { BILL_META, getDaysUntilDue } from '../../utils/bills';
 import type { BillCategory, BillFrequency } from '../../types';
 import toast from 'react-hot-toast';
 
-const fmt = (n: number) => `KSh ${n.toLocaleString('en-KE', { maximumFractionDigits: 0 })}`;
 
 export default function BillsPage() {
+  const sym = getCurrencySymbol();
+  const fmt = (n: number) => `${sym} ${Math.abs(n).toLocaleString('en-KE', { maximumFractionDigits: 0 })}`;
   const { bills, sortedBills, monthlyTotal, upcomingThisWeek, overdueCount, addBill, removeBill, markPaid, markUnpaid } = useBills();
   const [showAdd, setShowAdd] = useState(false);
   const [filter, setFilter] = useState<'all'|'upcoming'|'paid'|'overdue'>('all');

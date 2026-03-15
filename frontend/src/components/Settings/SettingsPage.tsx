@@ -4,6 +4,7 @@ import { useUser } from '../../hooks';
 import { aiApi } from '../../services/api';
 import { Country } from '../../types';
 import { CURRENCIES } from '../../utils/categories';
+import { saveCurrencySymbol } from '../../utils/currency';
 
 interface SettingsPageProps {
   onCurrencyChange: (currency: string, symbol: string) => void;
@@ -47,15 +48,19 @@ export default function SettingsPage({ onCurrencyChange }: SettingsPageProps) {
   };
 
   const handleCurrencyChange = (currency: string) => {
+    const symbol = CURRENCIES[currency]?.symbol || currency;
     setForm(f => ({ ...f, currency }));
-    onCurrencyChange(currency, CURRENCIES[currency]?.symbol || currency);
+    saveCurrencySymbol(symbol);
+    onCurrencyChange(currency, symbol);
   };
 
   const handleSave = async () => {
     setSaving(true);
     try {
       await updateUser({ ...form, monthlyIncome: parseFloat(form.monthlyIncome) || 0 });
-      onCurrencyChange(form.currency, CURRENCIES[form.currency]?.symbol || form.currency);
+      const symbol = CURRENCIES[form.currency]?.symbol || form.currency;
+      saveCurrencySymbol(symbol);
+      onCurrencyChange(form.currency, symbol);
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     } finally { setSaving(false); }
@@ -80,7 +85,11 @@ export default function SettingsPage({ onCurrencyChange }: SettingsPageProps) {
       </div>
 
       {loading ? (
-        <div className="card p-5"><div className="skeleton h-4 w-32 mb-4" /><div className="skeleton h-10 w-full mb-3" /><div className="skeleton h-10 w-full" /></div>
+        <div className="card p-5">
+          <div className="skeleton h-4 w-32 mb-4" />
+          <div className="skeleton h-10 w-full mb-3" />
+          <div className="skeleton h-10 w-full" />
+        </div>
       ) : (
         <>
           {/* Profile */}
@@ -149,7 +158,7 @@ export default function SettingsPage({ onCurrencyChange }: SettingsPageProps) {
                 style={{ background: 'rgba(96,165,250,0.07)', border: '1px solid rgba(96,165,250,0.18)' }}>
                 <DollarSign size={15} style={{ color: 'var(--info)', flexShrink: 0 }} />
                 <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                  Currency changes apply to all displayed values. Rates are approximate.
+                  Currency changes apply to all pages instantly including Bills, Investments and Net Worth.
                 </p>
               </div>
             </div>

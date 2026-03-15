@@ -1,11 +1,13 @@
+import { getCurrencySymbol } from '../../utils/currency';
 import React, { useState } from 'react';
 import { ShieldCheck, Plus, Minus, History } from 'lucide-react';
 import { useEmergencyFund } from '../../hooks/useEmergencyFund';
 import toast from 'react-hot-toast';
 
-const fmt = (n: number) => `KSh ${n.toLocaleString('en-KE', { maximumFractionDigits: 0 })}`;
 
 export default function EmergencyFundPage() {
+  const sym = getCurrencySymbol();
+  const fmt = (n: number) => `${sym} ${Math.abs(n).toLocaleString('en-KE', { maximumFractionDigits: 0 })}`;
   const monthlyExpenses = 35000; // TODO: pull from expenses hook
   const { data, targetAmount, progressPct, monthsCovered, deposit, withdraw, setTargetMonths, setCurrentAmount } = useEmergencyFund(monthlyExpenses);
   const [amount, setAmount] = useState('');

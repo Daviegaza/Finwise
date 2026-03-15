@@ -1,3 +1,4 @@
+import { getCurrencySymbol } from '../../utils/currency';
 import React, { useState } from 'react';
 import { Plus, Trash2, Landmark, TrendingUp, TrendingDown } from 'lucide-react';
 import { useNetWorth } from '../../hooks/useNetWorth';
@@ -5,9 +6,10 @@ import { ASSET_META, LIABILITY_META } from '../../utils/netWorth';
 import type { AssetCategory, LiabilityCategory } from '../../types';
 import toast from 'react-hot-toast';
 
-const fmt = (n: number) => `KSh ${Math.abs(n).toLocaleString('en-KE', { maximumFractionDigits: 0 })}`;
 
 export default function NetWorthPage() {
+  const sym = getCurrencySymbol();
+  const fmt = (n: number) => `${sym} ${Math.abs(n).toLocaleString('en-KE', { maximumFractionDigits: 0 })}`;
   const { items, summary, addItem, removeItem, updateAmount } = useNetWorth();
   const [showAdd, setShowAdd] = useState(false);
   const [type, setType] = useState<'asset'|'liability'>('asset');

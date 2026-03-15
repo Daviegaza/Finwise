@@ -1,3 +1,4 @@
+import { getCurrencySymbol } from '../../utils/currency';
 import React, { useState } from 'react';
 import { Plus, Trash2, TrendingUp, BarChart3 } from 'lucide-react';
 import { useLocalInvestments } from '../../hooks/useInvestments';
@@ -5,9 +6,10 @@ import { INVESTMENT_META, RISK_COLORS } from '../../utils/investments';
 import type { InvestmentCategory, InvestmentStatus } from '../../types';
 import toast from 'react-hot-toast';
 
-const fmt = (n: number) => `KSh ${n.toLocaleString('en-KE', { maximumFractionDigits: 0 })}`;
 
 export default function InvestmentsPage() {
+  const sym = getCurrencySymbol();
+  const fmt = (n: number) => `${sym} ${Math.abs(n).toLocaleString('en-KE', { maximumFractionDigits: 0 })}`;
   const { investments, monthlyInvestments, selectedMonth, setSelectedMonth, summary, addInvestment, removeInvestment, updateStatus } = useLocalInvestments();
   const [showAdd, setShowAdd] = useState(false);
   const [form, setForm] = useState({ name: '', amount: '', category: 'mmf' as InvestmentCategory, expectedReturnPct: '', date: new Date().toISOString().slice(0,7), notes: '', isRecurring: false });
