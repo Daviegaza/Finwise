@@ -3,26 +3,43 @@ import { useSummary, useTransactions, useInsights } from '../../hooks';
 import StatCards from '../Dashboard/StatCards';
 import SpendingChart from '../Dashboard/SpendingChart';
 import { CategoryBreakdown, RecentTransactions } from '../Dashboard/Widgets';
-import { Sparkles, AlertTriangle, TrendingUp, Target } from 'lucide-react';
+import {
+  Sparkles, AlertTriangle, TrendingUp, Target, ScanLine,
+  Receipt, TrendingDown, Calendar, Smartphone, BarChart3,
+  ShieldCheck, Repeat, Building2
+} from 'lucide-react';
 import { ActivePage } from '../../types';
-import { formatCurrency } from '../../utils/categories';
 
 interface DashboardProps {
   currencySymbol: string;
   onNavigate: (page: ActivePage) => void;
 }
 
+const QUICK_ACTIONS = [
+  { icon: ScanLine,    label: 'Scan Receipt',   page: 'receipt' as ActivePage,   color: '#C9A84C',  desc: 'Photo → auto-fill' },
+  { icon: Smartphone,  label: 'M-Pesa Import',  page: 'mpesa' as ActivePage,     color: '#34D399',  desc: 'Paste SMS messages' },
+  { icon: TrendingDown,label: 'Debt Planner',   page: 'debt' as ActivePage,      color: '#F87171',  desc: 'Avalanche & snowball' },
+  { icon: TrendingUp,  label: 'Forecast',       page: 'forecast' as ActivePage,  color: '#60A5FA',  desc: 'End-of-month predict' },
+  { icon: Sparkles,    label: 'AI Budget',      page: 'budget-ai' as ActivePage, color: '#A78BFA',  desc: 'Claude builds yours' },
+  { icon: Calendar,    label: 'Calendar',       page: 'calendar' as ActivePage,  color: '#FBBF24',  desc: 'Bills & events' },
+  { icon: BarChart3,   label: 'NSE Stocks',     page: 'stocks' as ActivePage,    color: '#34D399',  desc: 'Track portfolio' },
+  { icon: Building2,   label: 'SACCO Calc',     page: 'sacco' as ActivePage,     color: '#06B6D4',  desc: 'Loan eligibility' },
+  { icon: ShieldCheck, label: 'Emergency Fund', page: 'emergency' as ActivePage, color: '#F472B6',  desc: 'Safety net tracker' },
+  { icon: Repeat,      label: 'Recurring',      page: 'recurring' as ActivePage, color: '#94A3B8',  desc: 'Auto-detect subs' },
+  { icon: Target,      label: 'Goals',          page: 'goals' as ActivePage,     color: '#34D399',  desc: 'Track progress' },
+  { icon: Receipt,     label: 'Bills',          page: 'bills' as ActivePage,     color: '#FBBF24',  desc: 'Due dates & status' },
+];
+
 export default function Dashboard({ currencySymbol, onNavigate }: DashboardProps) {
   const [period, setPeriod] = useState<'month' | 'quarter' | 'year'>('month');
   const { summary, loading: summaryLoading } = useSummary(period);
   const { transactions, loading: txLoading } = useTransactions();
   const { insights, narrative, loading: insightLoading } = useInsights();
-
   const highPriorityInsights = insights.filter(i => i.priority === 'high').slice(0, 2);
 
   return (
     <div className="flex flex-col gap-5">
-      {/* Period selector */}
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="section-title">Dashboard</h2>
@@ -32,10 +49,7 @@ export default function Dashboard({ currencySymbol, onNavigate }: DashboardProps
           {(['month', 'quarter', 'year'] as const).map(p => (
             <button key={p} onClick={() => setPeriod(p)}
               className="px-3 py-1.5 rounded-lg text-xs font-medium capitalize transition-all duration-200"
-              style={{
-                background: period === p ? 'rgba(201,168,76,0.15)' : 'transparent',
-                color: period === p ? 'var(--gold)' : 'var(--text-muted)',
-              }}>
+              style={{ background: period === p ? 'rgba(201,168,76,0.15)' : 'transparent', color: period === p ? 'var(--gold)' : 'var(--text-muted)' }}>
               {p}
             </button>
           ))}
@@ -45,7 +59,7 @@ export default function Dashboard({ currencySymbol, onNavigate }: DashboardProps
       {/* Stat cards */}
       <StatCards summary={summary} loading={summaryLoading} currencySymbol={currencySymbol} />
 
-      {/* AI Narrative strip */}
+      {/* AI Narrative */}
       {!insightLoading && narrative && (
         <div className="card p-4 flex items-start gap-3 cursor-pointer"
           onClick={() => onNavigate('insights')}
@@ -56,9 +70,7 @@ export default function Dashboard({ currencySymbol, onNavigate }: DashboardProps
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-xs font-semibold gold-text mb-0.5">AI Financial Summary</p>
-            <p className="text-xs leading-relaxed line-clamp-2" style={{ color: 'var(--text-secondary)' }}>
-              {narrative}
-            </p>
+            <p className="text-xs leading-relaxed line-clamp-2" style={{ color: 'var(--text-secondary)' }}>{narrative}</p>
           </div>
           <span className="text-xs flex-shrink-0" style={{ color: 'var(--gold)' }}>View →</span>
         </div>
@@ -81,45 +93,39 @@ export default function Dashboard({ currencySymbol, onNavigate }: DashboardProps
         </div>
       )}
 
-      {/* Charts row */}
+      {/* Charts */}
       <div className="grid lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2">
           <SpendingChart summary={summary} loading={summaryLoading} currencySymbol={currencySymbol} />
         </div>
         <div>
-          {summary && !summaryLoading ? (
-            <CategoryBreakdown categories={summary.topCategories} currencySymbol={currencySymbol} />
-          ) : (
-            <div className="card p-5 skeleton h-64" />
-          )}
+          {summary && !summaryLoading
+            ? <CategoryBreakdown categories={summary.topCategories} currencySymbol={currencySymbol} />
+            : <div className="card p-5 skeleton h-64" />}
         </div>
       </div>
 
-      {/* Quick actions */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {[
-          { icon: TrendingUp, label: 'View Insights', page: 'insights' as ActivePage, color: 'var(--gold)' },
-          { icon: Target, label: 'My Goals', page: 'goals' as ActivePage, color: 'var(--success)' },
-          { icon: Sparkles, label: 'Ask AI', page: 'advisor' as ActivePage, color: 'var(--purple)' },
-          { icon: TrendingUp, label: 'Transactions', page: 'transactions' as ActivePage, color: 'var(--info)' },
-        ].map(({ icon: Icon, label, page, color }) => (
-          <button key={page} onClick={() => onNavigate(page)}
-            className="card p-4 flex flex-col items-center gap-2 text-center transition-all duration-200"
-            style={{ cursor: 'pointer' }}
-            onMouseEnter={e => {
-              (e.currentTarget as HTMLElement).style.borderColor = `${color}40`;
-              (e.currentTarget as HTMLElement).style.background = `${color}08`;
-            }}
-            onMouseLeave={e => {
-              (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)';
-              (e.currentTarget as HTMLElement).style.background = 'var(--bg-card)';
-            }}>
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: `${color}15` }}>
-              <Icon size={18} style={{ color }} />
-            </div>
-            <span className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>{label}</span>
-          </button>
-        ))}
+      {/* Quick Actions — all features */}
+      <div>
+        <h3 className="text-sm font-semibold mb-3 px-0.5" style={{ color: 'var(--text-secondary)' }}>Quick Access</h3>
+        <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3">
+          {QUICK_ACTIONS.map(({ icon: Icon, label, page, color, desc }) => (
+            <button key={page} onClick={() => onNavigate(page)}
+              className="card p-3 flex flex-col items-center gap-2 text-center transition-all duration-200 hover:scale-105"
+              style={{ cursor: 'pointer' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = `${color}40`; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'; }}>
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                style={{ background: `${color}18` }}>
+                <Icon size={17} style={{ color }} />
+              </div>
+              <div>
+                <p className="text-xs font-semibold leading-tight" style={{ color: 'var(--text-primary)' }}>{label}</p>
+                <p className="text-xs mt-0.5 hidden sm:block leading-tight" style={{ color: 'var(--text-muted)', fontSize: '10px' }}>{desc}</p>
+              </div>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Recent transactions */}

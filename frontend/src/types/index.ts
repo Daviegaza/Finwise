@@ -43,7 +43,55 @@ export interface Country {
 export type ActivePage =
   | 'dashboard' | 'transactions' | 'budget' | 'goals' | 'insights'
   | 'advisor' | 'settings' | 'bills' | 'networth' | 'investments'
-  | 'emergency' | 'habits' | 'alerts';
+  | 'emergency' | 'habits' | 'alerts'
+  | 'receipt' | 'forecast' | 'debt' | 'calendar' | 'mpesa'
+  | 'stocks' | 'sacco' | 'budget-ai' | 'recurring';
+
+// ─── Receipt Scanner ──────────────────────────────────────
+export interface ScannedReceipt {
+  id: string;
+  imageData: string;
+  merchant: string;
+  total: number;
+  date: string;
+  items: { name: string; amount: number }[];
+  category: TransactionCategory;
+  processed: boolean;
+  createdAt: string;
+}
+
+// ─── Debt ─────────────────────────────────────────────────
+export interface Debt {
+  id: string;
+  name: string;
+  balance: number;
+  interestRate: number;
+  minimumPayment: number;
+  category: 'credit_card' | 'personal_loan' | 'student_loan' | 'mortgage' | 'car_loan' | 'sacco_loan' | 'other';
+}
+
+// ─── Stocks ───────────────────────────────────────────────
+export interface TrackedStock {
+  id: string;
+  symbol: string;
+  name: string;
+  shares: number;
+  buyPrice: number;
+  currentPrice?: number;
+  lastUpdated?: string;
+}
+
+// ─── Recurring ────────────────────────────────────────────
+export interface RecurringPattern {
+  id: string;
+  description: string;
+  amount: number;
+  category: TransactionCategory;
+  frequency: 'weekly' | 'monthly' | 'yearly';
+  confidence: number;
+  lastSeen: string;
+  confirmed: boolean;
+}
 
 // ─── Bills ────────────────────────────────────────────────
 export type BillCategory = 'rent'|'electricity'|'water'|'internet'|'phone'|'insurance'|'subscription'|'loan'|'tv'|'other';
