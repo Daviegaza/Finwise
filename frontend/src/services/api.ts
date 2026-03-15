@@ -1,6 +1,6 @@
 import { Transaction, Budget, FinancialGoal, FinancialSummary, Insight, User, AIMessage, Country } from '../types';
 
-const BASE_URL = '/api';
+const BASE_URL = `${import.meta.env.VITE_API_URL || ''}/api`;
 const USER_ID = 'demo-user';
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
