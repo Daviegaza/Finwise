@@ -25,6 +25,7 @@ export default function App() {
   const [currencySymbol, setCurrencySymbol] = useState('$');
   const { user } = useUser();
 
+
   const handleCurrencyChange = (c: string, sym: string) => { setCurrency(c); setCurrencySymbol(sym); };
 
   const renderPage = () => {
